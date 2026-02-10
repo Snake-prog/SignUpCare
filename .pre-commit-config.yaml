@@ -1,0 +1,51 @@
+default_stages:
+  - commit
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+        stages:
+          - commit
+      - id: end-of-file-fixer
+        exclude: \.svg$
+        stages:
+          - commit
+
+  - repo: https://github.com/pre-commit/pygrep-hooks
+    rev: v1.10.0
+    hooks:
+      - id: python-check-blanket-noqa
+      - id: python-check-mock-methods
+        stages:
+          - commit
+
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+
+  - repo: https://github.com/MarcoGorelli/absolufy-imports
+    rev: v0.3.1
+    hooks:
+      - id: absolufy-imports
+
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.11.2
+    hooks:
+      - id: mypy
+        entry: mypy
+        pass_filenames: true
+        args: [ --follow-imports=silent ]  # workaround to import custom stubs correctly
+        exclude: /migrations/
+        additional_dependencies:
+          - types-croniter==2.0.0.0
+          - types-dateparser==1.1.4.10
+          - types-freezegun==1.1.10
+          - types-python-dateutil==2.8.19.14
+          - types-pytz==2023.3.1.1
+          - types-requests==2.31.0.10
+          - types-bleach==6.1.0
+          - types-PyYAML==6.0.12

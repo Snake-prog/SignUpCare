@@ -1,0 +1,48 @@
+{% extends "header.html" %}
+
+{% block container %}
+    <section class="position-relative py-4 py-xl-5">
+        <div class="container">
+            <div class="row d-flex justify-content-center">
+                <div class="col-md-6 col-xl-4">
+                    <div class="card mb-5">
+                        <div class="card-body d-flex flex-column align-items-center">
+                            <h1 style="color: var(--bs-blue);">Вход в систему</h1>
+                            <span style="margin-bottom: 32px;">Введите ваши данные для входа</span>
+                            <form class="text-center" method="post" action="{% url 'user:login' %}">
+                                {% csrf_token %}
+                                <div class="d-flex flex-column align-items-start mb-3">
+                                    <span>
+                                        <i class="fas fa-envelope" style="padding-right: 4px;"></i>Email
+                                    </span>
+                                    <input class="form-control" type="email" name="email"
+                                           placeholder="example@email.com" inputmode="email" required>
+                                </div>
+                                <div class="d-flex flex-column align-items-start mb-3">
+                                    <span>
+                                        <i class="fas fa-key" style="padding-right: 4px;"></i>Пароль
+                                    </span>
+                                    <input class="form-control" type="password" name="password" placeholder="*********"
+                                           required>
+                                </div>
+                                {% if error %}
+                                    <span style="color: var(--bs-danger);">{{ error }}</span>
+                                {% endif %}
+                                <div class="mb-3">
+                                    <button class="btn btn-primary d-block w-100" type="submit">Войти</button>
+                                    <div class="mb-3" style="margin-top: 16px;">
+                                        <a class="btn btn-light d-block w-100" role="button"
+                                           href="{% url 'user:register' %}"
+                                           style="border-style: solid;border-color: #e5ecf9;">
+                                            Зарегистрироваться
+                                        </a>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

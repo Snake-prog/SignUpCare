@@ -1,0 +1,301 @@
+{% extends "base.html" %}
+{% block body %}
+    <body style="background: var(--bs-blue);">
+    <section class="position-relative py-4 py-xl-5">
+        <div class="container">
+            <div class="row d-flex justify-content-center">
+                <div class="col-md-6 col-xl-4">
+                    <div class="card mb-5" style="border-style: none;">
+                        <div class="card-body d-flex flex-column align-items-center">
+                            <h1 class="text-center" style="color: var(--bs-blue);font-weight: bold;">Добро пожаловать в&nbsp;
+                                SignUpCare</h1>
+                            <span class="text-center">Удобная система онлайн-записи на услуги для людей с ограниченными возможностями</span>
+                            <div class="card"
+                                 style="margin-top: 16px;border-color: #e5ecf9;background: #eef5fe;min-width: 330px;">
+                                <div class="card-body">
+                                    <h4 class="card-title" style="text-align: center;">Настройки доступности</h4>
+                                    <div class="row">
+                                        <div class="col text-center">
+                                            <button id="ttsOnButton"
+                                                    class="btn btn-light d-flex justify-content-center align-items-center"
+                                                    type="button"
+                                                    style="max-width: 140px;">
+                                                <i class="fas fa-volume-up me-2"></i>
+                                                Озвучка включена
+                                            </button>
+                                        </div>
+
+                                        <div class="col text-center">
+                                            <button id="ttsOffButton"
+                                                    class="btn btn-light d-flex justify-content-center align-items-center"
+                                                    type="button"
+                                                    style="max-width: 140px;border:1px solid #e5ecf9;">
+                                                <i class="fas fa-volume-mute me-2"></i>
+                                                Озвучка выключена
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <form method="post" action="{% url 'user:wellcome' %}" style="min-width: 100%;">
+                                {% csrf_token %}
+                                <button class="btn btn-primary" type="submit" style="margin-top: 16px;min-width: 100%;">
+                                    <span style="color: var(--bs-btn-hover-color);">Продолжить</span>
+                                    <br>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+    <script>
+        (() => {
+
+            const storageKey = "ttsEnabled";
+
+            const ttsOnButton = document.getElementById("ttsOnButton");
+            const ttsOffButton = document.getElementById("ttsOffButton");
+
+            // ---------- STORAGE ----------
+
+            function ensureStorageExists() {
+                if (localStorage.getItem(storageKey) === null) {
+                    localStorage.setItem(storageKey, "true");
+                }
+            }
+
+            function readState() {
+                return localStorage.getItem(storageKey) === "true";
+            }
+
+            function saveState(value) {
+                localStorage.setItem(storageKey, String(value));
+            }
+
+            // ---------- UI ----------
+
+            function applyUiState(enabled) {
+
+                if (enabled) {
+
+                    // ON = primary
+                    ttsOnButton.classList.remove("btn-light");
+                    ttsOnButton.classList.add("btn-primary");
+
+                    // OFF = light
+                    ttsOffButton.classList.remove("btn-primary");
+                    ttsOffButton.classList.add("btn-light");
+
+                } else {
+
+                    // ON = light
+                    ttsOnButton.classList.remove("btn-primary");
+                    ttsOnButton.classList.add("btn-light");
+
+                    // OFF = primary
+                    ttsOffButton.classList.remove("btn-light");
+                    ttsOffButton.classList.add("btn-primary");
+                }
+            }
+
+            // ---------- INIT ----------
+
+            ensureStorageExists();
+
+            let currentState = readState();
+            applyUiState(currentState);
+
+            // ---------- EVENTS ----------
+
+            ttsOnButton.addEventListener("click", () => {
+                currentState = true;
+                saveState(true);
+                applyUiState(true);
+            });
+
+            ttsOffButton.addEventListener("click", () => {
+                currentState = false;
+                saveState(false);
+                applyUiState(false);
+            });
+
+        })();
+    </script>
+<script>
+(() => {
+
+  const storageKey = "ttsEnabled";
+
+  const speechEngine = window.speechSynthesis;
+
+  const ttsOnButton = document.getElementById("ttsOnButton");
+  const ttsOffButton = document.getElementById("ttsOffButton");
+
+  if (!ttsOnButton || !ttsOffButton) {
+    return;
+  }
+
+  // ---------------- STORAGE ----------------
+
+  function ensureStorageExists() {
+    if (localStorage.getItem(storageKey) === null) {
+      localStorage.setItem(storageKey, "true"); // по умолчанию включено
+    }
+  }
+
+  function readState() {
+    return localStorage.getItem(storageKey) === "true";
+  }
+
+  function saveState(value) {
+    localStorage.setItem(storageKey, String(value));
+  }
+
+  // ---------------- UI ----------------
+
+  function applyButtonsUi(isEnabled) {
+    if (isEnabled) {
+      // ON = primary, OFF = light
+      ttsOnButton.classList.remove("btn-light");
+      ttsOnButton.classList.add("btn-primary");
+
+      ttsOffButton.classList.remove("btn-primary");
+      ttsOffButton.classList.add("btn-light");
+    } else {
+      // ON = light, OFF = primary
+      ttsOnButton.classList.remove("btn-primary");
+      ttsOnButton.classList.add("btn-light");
+
+      ttsOffButton.classList.remove("btn-light");
+      ttsOffButton.classList.add("btn-primary");
+    }
+  }
+
+  // ---------------- TTS ----------------
+
+  function stopSpeech() {
+    if (speechEngine && speechEngine.speaking) {
+      speechEngine.cancel();
+    }
+  }
+
+  function speakRussian(text) {
+    const normalized = (text || "").replace(/\s+/g, " ").trim();
+    if (!normalized) return;
+
+    stopSpeech();
+
+    const utterance = new SpeechSynthesisUtterance(normalized);
+    utterance.lang = "ru-RU";
+    utterance.rate = 1;
+    utterance.pitch = 1;
+
+    speechEngine.speak(utterance);
+  }
+
+  function findFirstTextNodeInElement(targetElement) {
+    if (!targetElement) return null;
+
+    // не озвучиваем код/поля ввода/служебные элементы
+    const forbiddenSelector = "script,style,pre,code,input,textarea,select,option";
+    if (targetElement.closest && targetElement.closest(forbiddenSelector)) {
+      return null;
+    }
+
+    // не озвучиваем тексты на самих кнопках управления
+    if (targetElement.closest && targetElement.closest("#ttsOnButton, #ttsOffButton")) {
+      return null;
+    }
+
+    const walker = document.createTreeWalker(
+      targetElement,
+      NodeFilter.SHOW_TEXT,
+      {
+        acceptNode(node) {
+          const value = (node.nodeValue || "").replace(/\s+/g, " ").trim();
+          return value ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+        }
+      }
+    );
+
+    return walker.nextNode();
+  }
+
+  let isTtsEnabled = false;
+  let lastSpokenTextNode = null;
+  let debounceTimerId = null;
+
+  function scheduleSpeakFromTarget(targetElement) {
+    if (!isTtsEnabled) return;
+
+    if (debounceTimerId) window.clearTimeout(debounceTimerId);
+
+    debounceTimerId = window.setTimeout(() => {
+      if (!isTtsEnabled) return;
+
+      const textNode = findFirstTextNodeInElement(targetElement);
+      if (!textNode) return;
+
+      if (textNode === lastSpokenTextNode) return;
+      lastSpokenTextNode = textNode;
+
+      speakRussian(textNode.nodeValue);
+    }, 120);
+  }
+
+  function mouseOverHandler(event) {
+    scheduleSpeakFromTarget(event.target);
+  }
+
+  function mouseLeaveHandler() {
+    lastSpokenTextNode = null;
+    stopSpeech();
+  }
+
+  function enableTtsHandlers() {
+    document.addEventListener("mouseover", mouseOverHandler, { passive: true });
+    document.addEventListener("mouseleave", mouseLeaveHandler);
+  }
+
+  function disableTtsHandlers() {
+    document.removeEventListener("mouseover", mouseOverHandler);
+    document.removeEventListener("mouseleave", mouseLeaveHandler);
+    lastSpokenTextNode = null;
+    stopSpeech();
+  }
+
+  function applyState(enabled) {
+    isTtsEnabled = enabled;
+    saveState(enabled);
+    applyButtonsUi(enabled);
+
+    if (enabled) {
+      enableTtsHandlers();
+    } else {
+      disableTtsHandlers();
+    }
+  }
+
+  // ---------------- INIT ----------------
+
+  ensureStorageExists();
+  applyState(readState());
+
+  // ---------------- BUTTONS ----------------
+
+  ttsOnButton.addEventListener("click", () => applyState(true));
+  ttsOffButton.addEventListener("click", () => applyState(false));
+
+  // Esc — остановка озвучки
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") stopSpeech();
+  });
+
+})();
+</script>
+
+{% endblock %}

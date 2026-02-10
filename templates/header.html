@@ -1,0 +1,242 @@
+{% extends "body.html" %}
+
+
+{% block content %}
+    <header class="d-flex flex-row flex-grow-0 justify-content-center align-content-center flex-nowrap"
+            style="background: var(--bs-blue);padding: 10px;display: flex;color: var(--bs-light);">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-3 col-md-4 d-flex justify-content-start align-items-center align-content-center">
+                    <span class="d-flex align-items-center"
+                          style="color: rgb(255,255,255);font-weight: bold;text-align: center;">SignUpCare</span></div>
+                <div class="col-sm-8 d-flex justify-content-end align-items-center align-content-center">
+                    <div class="row">
+                        <div class="col">
+                            <div class="text-nowrap d-flex flex-row justify-content-center align-items-center flex-nowrap"
+                                 style="background: var(--bs-link-hover-color);border-radius: 6px;margin-right: 16px;min-height: 36px;max-width: 235px;">
+                                <span style="margin-left: 6px;margin-right: 6px;">Размер текста:</span>
+
+                                <button type="button"
+                                        class="btn p-0 d-flex justify-content-center align-items-center font-size-option"
+                                        data-font-size="small"
+                                        style="background: var(--bs-blue);font-size: 12px;height: 20px;width: 20px;margin-right: 6px;border-radius: 2px;">
+                                    <span>A</span>
+                                </button>
+
+                                <button type="button"
+                                        class="btn p-0 d-flex justify-content-center align-items-center font-size-option"
+                                        data-font-size="normal"
+                                        style="background: var(--bs-blue);font-size: 16px;width: 24px;height: 24px;margin-right: 6px;border-radius: 2px;">
+                                    <span>A</span>
+                                </button>
+
+                                <button type="button"
+                                        class="btn p-0 d-flex justify-content-center align-items-center font-size-option"
+                                        data-font-size="large"
+                                        style="background: var(--bs-blue);font-size: 20px;height: 28px;width: 28px;margin-right: 6px;border-radius: 2px;">
+                                    <span>A</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <button
+                                    id="ttsToggleButton"
+                                    class="btn btn-primary d-flex justify-content-center align-items-center"
+                                    type="button"
+                                    style="display:flex;background: var(--bs-btn-active-border-color);"
+                            >
+                                <i id="ttsToggleIcon" class="fas fa-volume-up" style="padding-right: 10px;"></i>
+                                <span id="ttsToggleText">Озвучка включена</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            const STORAGE_KEY = "ui_font_size";
+
+            function applyFontSize(fontSize) {
+                const allowedValues = new Set(["small", "normal", "large"]);
+                const finalValue = allowedValues.has(fontSize) ? fontSize : "normal";
+
+                document.documentElement.classList.remove("font-small", "font-normal", "font-large");
+                document.documentElement.classList.add(`font-${finalValue}`);
+
+                document.querySelectorAll(".font-size-option").forEach(buttonElement => {
+                    buttonElement.classList.toggle("is-active", buttonElement.dataset.fontSize === finalValue);
+                });
+
+                localStorage.setItem(STORAGE_KEY, finalValue);
+            }
+
+            document.addEventListener("DOMContentLoaded", () => {
+                applyFontSize(localStorage.getItem(STORAGE_KEY) || "normal");
+
+                document.querySelectorAll(".font-size-option").forEach(buttonElement => {
+                    buttonElement.addEventListener("click", () => {
+                        applyFontSize(buttonElement.dataset.fontSize);
+                    });
+                });
+            });
+        </script>
+    </header>
+    {% block container %}
+    {% endblock %}
+    <script>
+        (() => {
+
+            const localStorageKey = "ttsEnabled";
+            const speechEngine = window.speechSynthesis;
+
+            const toggleButton = document.getElementById("ttsToggleButton");
+            const toggleIcon = document.getElementById("ttsToggleIcon");
+            const toggleText = document.getElementById("ttsToggleText");
+
+            // ------------------------------
+            // LOCAL STORAGE INIT
+            // ------------------------------
+            function ensureLocalStorageKeyExists() {
+                if (localStorage.getItem(localStorageKey) === null) {
+                    localStorage.setItem(localStorageKey, "true"); // по умолчанию включено
+                }
+            }
+
+            function readState() {
+                return localStorage.getItem(localStorageKey) === "true";
+            }
+
+            function writeState(value) {
+                localStorage.setItem(localStorageKey, String(value));
+            }
+
+            // ------------------------------
+            // UI
+            // ------------------------------
+            function updateButtonUi(isEnabled) {
+
+                toggleIcon.classList.remove("fa-volume-up", "fa-volume-mute", "fa-volume-off");
+
+                if (isEnabled) {
+                    toggleIcon.classList.add("fa-volume-up");
+                    toggleText.textContent = "Озвучка включена";
+                } else {
+                    toggleIcon.classList.add("fa-volume-mute");
+                    toggleText.textContent = "Озвучка выключена";
+                }
+            }
+
+            // ------------------------------
+            // SPEECH
+            // ------------------------------
+            function stopSpeech() {
+                if (speechEngine.speaking) speechEngine.cancel();
+            }
+
+            function speak(text) {
+                if (!text) return;
+
+                stopSpeech();
+
+                const utter = new SpeechSynthesisUtterance(text.trim());
+                utter.lang = "ru-RU";
+
+                speechEngine.speak(utter);
+            }
+
+            function findTextNode(element) {
+
+                if (!element) return null;
+
+                const forbidden = "script,style,pre,code,input,textarea,select,option";
+                if (element.closest && element.closest(forbidden)) return null;
+
+                const walker = document.createTreeWalker(
+                    element,
+                    NodeFilter.SHOW_TEXT,
+                    {
+                        acceptNode(node) {
+                            return node.nodeValue.trim()
+                                ? NodeFilter.FILTER_ACCEPT
+                                : NodeFilter.FILTER_REJECT;
+                        }
+                    }
+                );
+
+                return walker.nextNode();
+            }
+
+            // ------------------------------
+            // EVENTS
+            // ------------------------------
+            let isEnabled;
+            let lastNode = null;
+            let debounceTimer = null;
+
+            function scheduleSpeak(target) {
+
+                if (!isEnabled) return;
+
+                if (debounceTimer) clearTimeout(debounceTimer);
+
+                debounceTimer = setTimeout(() => {
+
+                    const node = findTextNode(target);
+                    if (!node) return;
+                    if (node === lastNode) return;
+
+                    lastNode = node;
+                    speak(node.nodeValue);
+
+                }, 120);
+            }
+
+            function mouseOverHandler(event) {
+                scheduleSpeak(event.target);
+            }
+
+            function mouseLeaveHandler() {
+                lastNode = null;
+                stopSpeech();
+            }
+
+            function enableHandlers() {
+                document.addEventListener("mouseover", mouseOverHandler, {passive: true});
+                document.addEventListener("mouseleave", mouseLeaveHandler);
+            }
+
+            function disableHandlers() {
+                document.removeEventListener("mouseover", mouseOverHandler);
+                document.removeEventListener("mouseleave", mouseLeaveHandler);
+                stopSpeech();
+            }
+
+            function applyState(state) {
+
+                isEnabled = state;
+                writeState(state);
+                updateButtonUi(state);
+
+                if (state) enableHandlers();
+                else disableHandlers();
+            }
+
+            // ------------------------------
+            // INIT
+            // ------------------------------
+
+            ensureLocalStorageKeyExists();
+
+            isEnabled = readState();
+            updateButtonUi(isEnabled);
+
+            if (isEnabled) enableHandlers();
+
+            toggleButton.addEventListener("click", () => {
+                applyState(!isEnabled);
+            });
+
+        })();
+    </script>
+
+{% endblock %}

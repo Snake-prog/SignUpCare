@@ -1,0 +1,27 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+    <!-- Фон прозрачный -->
+    <rect width="512" height="512" fill="none"/>
+
+    <!-- Круг с разрывом -->
+    <circle
+            cx="256"
+            cy="256"
+            r="169"
+            fill="none"
+            stroke="#3A5E3A"
+            stroke-width="69"
+            stroke-linecap="round"
+            stroke-dasharray="360"
+            transform="rotate(69 252 256)"
+    />
+    <circle
+            cx="256"
+            cy="256"
+            r="6"
+            fill="none"
+            stroke="#3A5E3A"
+            stroke-width="69"
+            stroke-linecap="round"
+    />
+
+</svg>

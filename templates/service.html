@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% extends "header.html" %}
+
+{% block container %}
+    <div class="container py-4 py-xl-5">
+        <div class="row mb-5">
+            <div class="col-md-8 col-xl-6 text-center flex-fill mx-auto">
+                <div class="row d-flex flex-fill justify-content-start">
+                    <div class="col d-flex justify-content-start align-items-center"><a href="{% url 'care:services' %}"
+                                                                                        style="text-decoration: none;font-size: 23px;"><i
+                            class="fas fa-arrow-left" style="margin-right: 6px;"></i>Назад к услугам</a></div>
+                </div>
+                <div class="row d-flex flex-fill justify-content-start">
+                    <div class="col d-flex justify-content-start align-items-center">
+                        <h1 style="color: var(--bs-blue);text-align: left;">{{ service.name }}</h1>
+                    </div>
+                    <div class="col d-flex justify-content-end align-items-center" style="text-align: right;"><a
+                            class="btn btn-primary" href="{% url 'user:user' %}" role="button"><i
+                            class="far fa-user-circle" style="padding-right: 10px;"></i>Личный кабинет<br></a></div>
+                </div>
+                <div class="row">
+                    <div class="col d-flex flex-row justify-content-start flex-wrap" style="padding-top: 16px;">
+                        <div class="d-flex align-items-center">
+                            <h3>Стоимость:&nbsp;</h3>
+                            <h3 style="color: var(--bs-blue);">{{ service.price }}&nbsp;₽</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <h2>Выберете специалиста</h2>
+        <div class="row gy-4 row-cols-1 row-cols-md-2 row-cols-xl-3">
+            {% for specialist in specialists %}
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body p-4" style="min-height: 210px;">
+                            <div class="d-flex justify-content-between align-items-start align-content-center"
+                                 style="margin-bottom: 8px;">
+                                <div class="d-flex justify-content-center align-items-center align-content-center">
+                                    <div class="col">
+                                        <div class="row">
+                                            <div class="col">
+                                                <h4>{{ specialist.name }}</h4>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                <h4><i class="fas fa-star"
+                                                       style="color: var(--bs-yellow); margin-right: 6px;"></i>{{ specialist.avg_score|default:"—"|floatformat:1 }}
+                                                </h4>
+                                                <span>({{ specialist.reviews.count }} отзыв{% if specialist.reviews.count > 1 %}ов{% endif %})</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-center align-items-center align-content-center">
+                                    <button class="btn btn-light d-block w-100" type="button"
+                                            style="border-style: solid;border-color: #e5ecf9;"
+                                            data-bs-target="#modal-{{ specialist.id }}"
+                                            data-bs-toggle="modal">Выбрать
+                                    </button>
+                                </div>
+                            </div>
+                            {% if specialist.achievements.count %}
+                                <h5 class="card-title" style="color: var(--bs-black);"><i class="fas fa-medal"
+                                                                                          style="color: var(--bs-blue);"></i>Достижения:
+                                </h5>
+                                <ul>
+                                    {% for achievement in specialist.achievements.all %}
+                                        <li>{{ achievement.name }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                            {% if specialist.reviews.count %}
+                                <span style="color: var(--bs-blue);text-decoration:  underline;"
+                                      id="reviews-toggle-{{ specialist.id }}"
+                                      data-specialist-id="{{ specialist.id }}"
+                                >Показать отзывы</span>
+                            {% endif %}
+                            <div
+                                    id="reviews-block-{{ specialist.id }}"
+                                    style="display: none;"
+                            >
+                                <hr>
+                                {% for review in specialist.reviews.all %}
+                                    <div class="col"
+                                         style="background: var(--bs-gray-100);padding: 8px;border-radius: 8px;margin-bottom: 8px;">
+                                        <div class="row">
+                                            <div class="col d-flex flex-column">
+                                                <h6>{{ review.name }}</h6><span>{{ review.comment }}</span><span
+                                                    style="color: var(--bs-gray-500);">{{ review.date }}</span>
+                                            </div>
+                                            <div class="col-3 d-flex justify-content-end align-items-start align-content-center">
+                                                <h6><i class="fas fa-star"
+                                                       style="color: var(--bs-yellow); margin-right: 6px;"></i>{{ review.score }}
+                                                </h6>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+
+                            </div>
+                            <div class="modal fade" role="dialog" tabindex="-1" id="modal-{{ specialist.id }}">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h4 class="modal-title">Создать запись</h4>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                        </div>
+                                        <form method="post" action="{% url 'care:service' service.id %}">
+                                            {% csrf_token %}
+                                            <input class="form-control" type="text" name="specialist_id"
+                                                   value="{{ specialist.id }}" hidden>
+                                            <div class="modal-body">
+                                                <div class="d-flex justify-content-between align-items-center align-content-center"
+                                                     style="margin-bottom: 8px;">
+                                                    <div class="d-flex justify-content-center align-items-center align-content-center">
+                                                        <div class="col">
+                                                            <div class="row">
+                                                                <div class="col">
+                                                                    <h4>{{ service.name }}<br></h4>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col">
+                                                                    <h4 style="color: var(--bs-blue);">{{ service.price }}
+                                                                        ₽</h4><span>{{ specialist.name }}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex justify-content-center align-items-center align-content-center"></div>
+                                                </div>
+                                                <div class="d-flex flex-column align-items-start mb-3"><span><i
+                                                        class="fas fa-calendar"
+                                                        style="padding-right: 4px;"></i>Дата</span>
+                                                    <input class="form-control" type="date" name="date" required>
+                                                </div>
+                                                <div class="d-flex flex-column align-items-start mb-3"><span><i
+                                                        class="fas fa-clock"
+                                                        style="padding-right: 4px;"></i>Время</span>
+                                                    <input class="form-control" type="time" name="time" required>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button class="btn btn-light" type="button" data-bs-dismiss="modal">
+                                                    Отменить
+                                                </button>
+                                                <button class="btn btn-primary" type="submit">Записаться</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            document.querySelectorAll("[id^='reviews-toggle-']").forEach(toggleElement => {
+
+                toggleElement.addEventListener("click", function () {
+
+                    const specialistId = this.dataset.specialistId;
+                    const reviewsBlock = document.getElementById(`reviews-block-${specialistId}`);
+
+                    if (!reviewsBlock) return;
+
+                    const isHidden = reviewsBlock.style.display === "none" || reviewsBlock.style.display === "";
+
+                    if (isHidden) {
+                        reviewsBlock.style.display = "block";
+                        this.textContent = "Скрыть отзывы";
+                    } else {
+                        reviewsBlock.style.display = "none";
+                        this.textContent = "Показать отзывы";
+                    }
+
+                });
+
+            });
+
+        });
+    </script>
+
+    {% if specialist_id %}
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const modalElement = document.getElementById("modal-{{ specialist_id }}");
+                if (!modalElement) return;
+                new bootstrap.Modal(modalElement).show();
+            });
+        </script>
+    {% endif %}
+{% endblock %}

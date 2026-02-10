@@ -1,0 +1,80 @@
+amqp==5.3.1
+annotated-types==0.7.0
+asgiref==3.11.0
+billiard==4.2.4
+celery==5.6.2
+cffi==2.0.0
+click==8.3.1
+click-didyoumean==0.3.1
+click-plugins==1.1.1.2
+click-repl==0.3.0
+colorama==0.4.6
+cron_descriptor==2.0.6
+cryptography==46.0.3
+Django==5.2
+django-configurations==2.5.1
+django-cors-headers==4.9.0
+django-filter==25.2
+django-jazzmin==3.0.1
+django-modern-rest==0.0.0
+django-redis==6.0.0
+django-timezone-field==7.2.1
+django_celery_results==2.6.0
+djangorestframework==3.16.1
+drf-yasg==1.21.14
+execnet==2.1.2
+factory_boy==3.3.3
+Faker==40.1.2
+inflection==0.5.1
+iniconfig==2.3.0
+jwt==1.4.0
+packaging==25.0
+pluggy==1.6.0
+prompt_toolkit==3.0.52
+pycparser==2.23
+pydantic==2.12.5
+pydantic_core==2.41.5
+Pygments==2.19.2
+pytest==9.0.2
+pytest-django==4.11.1
+pytest-env==1.2.0
+pytest-factoryboy==2.8.1
+pytest-mock==3.15.1
+pytest-smartcov==0.3
+pytest-xdist==3.8.0
+python-crontab==3.3.0
+python-dateutil==2.9.0.post0
+python-dotenv==1.2.1
+pytz==2025.2
+PyYAML==6.0.3
+redis==7.1.0
+six==1.17.0
+sqlparse==0.5.5
+typing-inspection==0.4.2
+typing_extensions==4.15.0
+tzdata==2025.3
+vine==5.1.0
+wcwidth==0.2.14
+django-celery-beat==2.8.1
+ffmpeg==1.4
+Pillow==12.1.0
+
+semver
+uritemplate
+kombu
+
+restdoctor==0.0.64 # NOT REQUIRED
+# django-pgbulk==3.2.4 # NOT REQUIRED
+# django-pgviews==0.6.0 # NOT REQUIRED
+# django-solo==2.4.0 # NOT REQUIRED
+# django-timezone-field==7.2.1 # NOT REQUIRED
+# coverage==7.11.0 # NOT REQUIRED
+
+# psycopg2-binary==2.9.11 # IF psycopg2 dose not working
+
+# IDK ?
+# openpyxl==3.1.5
+# setuptools==80.9.0
+# et_xmlfile==2.0.0
+
+
