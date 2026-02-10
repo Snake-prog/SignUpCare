@@ -76,27 +76,9 @@ class SpecialistAchievement(abstract_model.AbstractBaseModel):
         default_related_name = "achievements"
 
     name = models.CharField(
-        verbose_name="автор оценки",
-        help_text="автор оценки",
+        verbose_name="название",
+        help_text="название",
         max_length=150,
-    )
-    date = models.DateField(
-        verbose_name=_("date"),
-        help_text=_("date"),
-        null=True,
-        blank=True,
-    )
-    score = models.PositiveIntegerField(
-        verbose_name="оценка",
-        help_text="оценка",
-        validators=[validators.MaxValueValidator(5)],
-        default=0,
-    )
-    comment = models.TextField(
-        verbose_name="комментарий",
-        help_text="комментарий",
-        null=True,
-        blank=True,
     )
     specialist = models.ForeignKey(
         to=Specialist,
