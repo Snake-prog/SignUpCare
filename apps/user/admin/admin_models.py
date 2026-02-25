@@ -26,15 +26,15 @@ class UserAdmin(auth_admin.UserAdmin, abstract_admin.AbstractAdmin):
             }
         ),
         (
-            _("personal information"),
-            {
-                "fields": (
-                    "phone",
-                    "name",
-                    "passport",
-                    "policy",
-                )
-            }
+                _("personal information"),
+                {
+                    "fields": (
+                        "phone",
+                        "name",
+                        "passport",
+                        "policy",
+                    )
+                }
         ),
         (
             _("permissions"),
@@ -77,6 +77,7 @@ class UserAdmin(auth_admin.UserAdmin, abstract_admin.AbstractAdmin):
     )
     search_fields = (
         "email",
+        "phone"
     )
     ordering = ("date_joined",)
     actions = (
